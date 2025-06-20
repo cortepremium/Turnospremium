@@ -1,0 +1,155 @@
+// Turnos Premium - Web interna + pública con control de interfaz
+import React, { useState } from "react";
+
+export default function App() {
+  const [modoAdmin, setModoAdmin] = useState(false);
+  const [paso, setPaso] = useState(1);
+  const [servicio, setServicio] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [datosServicios, setDatosServicios] = useState([
+    "Corte de pelo",
+    "Perfilado de cejas",
+    "Afeitado de barba",
+    "Membresía Básica",
+    "Membresía Premium"
+  ]);
+  const [nombreWeb, setNombreWeb] = useState("Corte Premium 💈");
+  const [colorBoton, setColorBoton] = useState("bg-black");
+
+  const handleSubmit = () => {
+    const msg =
+      `👋 Hola, soy ${nombre}.\n` +
+      `Quisiera reservar un turno en *${nombreWeb}*.\n` +
+      `✂️ Servicio: ${servicio}\n📞 Tel: ${telefono}\n📧 Email: ${email}`;
+    const url =
+      `https://wa.me/549${telefono.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+        msg
+      )}`;
+    window.open(url, "_blank");
+  };
+
+  const Publica = () => (
+    <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl p-6">
+      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        {nombreWeb}
+      </h1>
+      {paso === 1 && (
+        <>
+          <p className="text-center text-lg mb-4">
+            ¡Reservá tu turno online en segundos!
+          </p>
+          <button
+            onClick={() => setPaso(2)}
+            className={`${colorBoton} text-white px-6 py-3 rounded-xl w-full hover:opacity-90`}
+          >
+            Reservar ahora
+          </button>
+        </>
+      )}
+      {paso === 2 && (
+        <>
+          <p className="text-xl mb-4 font-medium">Seleccioná tu servicio</p>
+          <select
+            className="w-full border p-3 rounded-xl mb-4"
+            value={servicio}
+            onChange={(e) => setServicio(e.target.value)}
+          >
+            <option value="">Seleccionar</option>
+            {datosServicios.map((s, i) => (
+              <option key={i}>{s}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => servicio && setPaso(3)}
+            className={`${colorBoton} text-white px-6 py-3 rounded-xl w-full hover:opacity-90`}
+          >
+            Siguiente
+          </button>
+        </>
+      )}
+      {paso === 3 && (
+        <>
+          <p className="text-xl mb-4 font-medium">Completá tus datos</p>
+          <input
+            type="text"
+            placeholder="Nombre completo"
+            className="w-full border p-3 rounded-xl mb-3"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Número de teléfono (solo números)"
+            className="w-full border p-3 rounded-xl mb-3"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+          />
+          <input
+            type="email"
+            placeholder="Correo electrónico (opcional)"
+            className="w-full border p-3 rounded-xl mb-4"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <button
+            onClick={handleSubmit}
+            className="bg-green-600 text-white px-6 py-3 rounded-xl w-full hover:bg-green-700"
+          >
+            Confirmar turno vía WhatsApp
+          </button>
+        </>
+      )}
+    </div>
+  );
+
+  const Admin = () => (
+    <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl p-6">
+      <h2 className="text-2xl font-bold mb-4">Panel interno Corte Premium 🛠️</h2>
+      <label className="block mb-2 font-medium">Nombre de la Web:</label>
+      <input
+        value={nombreWeb}
+        onChange={(e) => setNombreWeb(e.target.value)}
+        className="w-full border p-3 rounded-xl mb-4"
+      />
+
+      <label className="block mb-2 font-medium">Color del botón principal:</label>
+      <select
+        value={colorBoton}
+        onChange={(e) => setColorBoton(e.target.value)}
+        className="w-full border p-3 rounded-xl mb-4"
+      >
+        <option value="bg-black">Negro</option>
+        <option value="bg-blue-600">Azul</option>
+        <option value="bg-red-600">Rojo</option>
+      </select>
+
+      <label className="block mb-2 font-medium">Servicios disponibles:</label>
+      <textarea
+        value={datosServicios.join("\n")}
+        onChange={(e) => setDatosServicios(e.target.value.split("\n"))}
+        className="w-full border p-3 rounded-xl mb-4"
+        rows={5}
+      />
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
+      <div className="w-full flex justify-end mb-4 max-w-xl">
+        <button
+          onClick={() => setModoAdmin(!modoAdmin)}
+          className="text-sm text-blue-600 underline"
+        >
+          {modoAdmin ? "Ver sitio público" : "Acceder como administrador"}
+        </button>
+      </div>
+      {modoAdmin ? <Admin /> : <Publica />}
+      <p className="text-sm text-gray-500 mt-6">
+        © {new Date().getFullYear()} Corte Premium · Rincón 2049 · Lun a Vie 9-20h · Sáb 9:30-20h
+      </p>
+    </div>
+  );
+}
